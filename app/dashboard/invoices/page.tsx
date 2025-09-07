@@ -5,7 +5,6 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-// import { SearchParams } from 'next/dist/server/request/search-params';
 import { fetchInvoicesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 
@@ -13,16 +12,18 @@ export const metadata: Metadata = {
   title: 'Invoices',
 };
 
-export default async function Page(props: {
-    SearchParams?: Promise<{
-        query?: string;
-        page?: string;
-    }>;
+// Correct the props interface
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
 }) {
-    const searchParams = await props.SearchParams;
-    const query = searchParams?.query || '';
-    const currentPage = Number(searchParams?.page) || 1;
-    const totalPages = await fetchInvoicesPages(query);
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+  const totalPages = await fetchInvoicesPages(query);
 
   return (
     <div className="w-full">
@@ -33,7 +34,7 @@ export default async function Page(props: {
         <Search placeholder="Search invoices..." />
         <CreateInvoice />
       </div>
-       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
